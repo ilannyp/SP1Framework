@@ -52,6 +52,10 @@ struct SGameChar
     COORD m_cLocation;
     bool  m_bActive;
 };
+struct SGameDoor
+{
+    COORD m_dLocation;
+};
 
 struct endDoor
 {
