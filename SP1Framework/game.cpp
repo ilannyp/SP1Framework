@@ -632,7 +632,8 @@ void renderInputEvents()
       {
               if (g_skKeyEvent[K_SPACE].keyReleased)
               {
-                  g_bQuitGame = true;
+                  clearScreen(); 
+                  loadlvl2();
               }
             
 
