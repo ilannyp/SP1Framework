@@ -16,7 +16,7 @@ SMouseEvent g_mouseEvent;
 
 // Game specific variables here
 SGameChar   g_sChar;
-endDoor g_endDoor;
+SGameDoor   g_dDoor;
 EGAMESTATES g_eGameState = S_SPLASHSCREEN; // initial state
 
 // Console object
@@ -202,12 +202,13 @@ void gameplayMouseHandler(const MOUSE_EVENT_RECORD& mouseEvent)
     g_mouseEvent.buttonState = mouseEvent.dwButtonState;
     g_mouseEvent.eventFlags = mouseEvent.dwEventFlags;
 }
-
-void renderEndDoor()
+void renderDoor()
 {
-    WORD colour = 0x1A;
-    g_Console.writeToBuffer(g_endDoor.location, (char)1, colour);
+    WORD doorColor = 0x0F;
+    g_Console.writeToBuffer(g_dDoor.m_dLocation,(char)48, doorColor);
 }
+
+
 
 /*void renderMap2()
 {
@@ -407,7 +408,8 @@ void renderGame()
 {
     renderMap();        // renders the map to the buffer first
     renderCharacter();  // renders the character into the buffer
-    renderEndDoor();    // renders the door to next stage
+    renderDoor();  //renders door to go to the next level
+    
 }
 
 void loadlvl1()
@@ -584,7 +586,17 @@ void renderInputEvents()
     ss.str("");
     ss << "Mouse position (" << g_mouseEvent.mousePosition.X << ", " << g_mouseEvent.mousePosition.Y << ")";
     g_Console.writeToBuffer(g_mouseEvent.mousePosition, ss.str(), 0x59);
- 
+    
+    
+    if (g_sChar.m_cLocation.X == g_dDoor.m_dLocation.X && g_sChar.m_cLocation.Y == g_dDoor.m_dLocation.Y)
+      {
+              if (g_skKeyEvent[K_SPACE].keyReleased)
+              {
+                  g_bQuitGame = true;
+              }
+            
+
+      }
     
 }
 
