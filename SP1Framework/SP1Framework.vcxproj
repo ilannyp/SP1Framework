@@ -88,6 +88,13 @@
     <ClInclude Include="Framework\timer.h" />
     <ClInclude Include="game.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="lvl1" />
+    <None Include="lvl2" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="titlescreen.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

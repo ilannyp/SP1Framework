@@ -373,27 +373,27 @@ void renderSplashScreen()  // renders the splash screen
         {
             if (title[y][x] == '|')
             {
-                g_Console.writeToBuffer(x, y, '|');
+                g_Console.writeToBuffer(x, y, '|',BACKGROUND_BLUE | FOREGROUND_RED);
             }
             if (title[y][x] == '_')
             {
-                g_Console.writeToBuffer(x, y, '_');
+                g_Console.writeToBuffer(x, y, '_', BACKGROUND_BLUE | FOREGROUND_RED);
             }
             if (title[y][x] == '/')
             {
-                g_Console.writeToBuffer(x, y, '/');
+                g_Console.writeToBuffer(x, y, '/', BACKGROUND_BLUE | FOREGROUND_RED);
             }
             if (title[y][x] == '.')
             {
-                g_Console.writeToBuffer(x, y, '.');
+                g_Console.writeToBuffer(x, y, '.', BACKGROUND_BLUE | FOREGROUND_RED);
             }
             if (title[y][x] == '>')
             {
-                g_Console.writeToBuffer(x, y, '>');
+                g_Console.writeToBuffer(x, y, '>', BACKGROUND_BLUE | FOREGROUND_RED);
             }
             if (title[y][x] == '(')
             {
-                g_Console.writeToBuffer(x, y, '(');
+                g_Console.writeToBuffer(x, y, '(', BACKGROUND_BLUE | FOREGROUND_RED);
             }
         }
     }
@@ -463,9 +463,9 @@ void loadlvl1()
     }
 }
 
-void walls(int x, int y)
+void gameOver()
 {
-    
+    clearScreen();
     
     
 }

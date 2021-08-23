@@ -86,6 +86,6 @@ void gameplayMouseHandler(const MOUSE_EVENT_RECORD& mouseEvent); // handles mous
 
 void renderEndDoor();
 void loadlvl1();
-void walls(int x, int y);
 void loadlvl2();
+void gameOver();
 #endif // _GAME_H
