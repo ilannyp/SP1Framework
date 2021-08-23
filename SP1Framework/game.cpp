@@ -56,8 +56,7 @@ void init( void )
     g_Console.setKeyboardHandler(keyboardHandler);
     g_Console.setMouseHandler(mouseHandler);
 
-    g_endDoor.location.X = 12;
-    g_endDoor.location.Y = 12;
+ 
 }
 
 //--------------------------------------------------------------
@@ -202,10 +201,13 @@ void gameplayMouseHandler(const MOUSE_EVENT_RECORD& mouseEvent)
     g_mouseEvent.buttonState = mouseEvent.dwButtonState;
     g_mouseEvent.eventFlags = mouseEvent.dwEventFlags;
 }
-void renderDoor()
+void renderDoor(double x, double y)
 {
     WORD doorColor = 0x0F;
     g_Console.writeToBuffer(g_dDoor.m_dLocation,(char)48, doorColor);
+    g_dDoor.m_dLocation.X = x;
+    g_dDoor.m_dLocation.Y = y;
+
 }
 
 
@@ -402,13 +404,26 @@ void renderSplashScreen()  // renders the splash screen
     c.Y /= 3;
     c.X = c.X / 2 - 5;
     g_Console.writeToBuffer(c, "Start", 0x03);
+
+    c.Y = 18;
+    c.X = 0;
+    g_Console.writeToBuffer(c, "The year is 20210 you are the captain of a sea exploration team as the earth has", 0x03);
+    c.Y = 19;
+    c.X = 0;
+    g_Console.writeToBuffer(c, "been 80% submerged into the ocean, you are sent to explore the inner depths of", 0x03);
+    c.Y = 20;
+    c.X = 0;
+    g_Console.writeToBuffer(c, "the ocean, said to hold great treasures.", 0x03);
+    c.Y = 22;
+    c.X = 7;
+    g_Console.writeToBuffer(c, "You find an entrance to a hidden cave-like structure and enter", 0x03);
 }
 
 void renderGame()
 {
     renderMap();        // renders the map to the buffer first
     renderCharacter();  // renders the character into the buffer
-    renderDoor();  //renders door to go to the next level
+    renderDoor(21,20);  //renders door to go to the next level
     
 }
 
@@ -426,7 +441,7 @@ void loadlvl1()
 
     std::string elem;
     // Init and store Map
-    
+
     int x = 0;
     while (getline(inFile, elem)) //get file by string
     {
@@ -434,10 +449,35 @@ void loadlvl1()
         {
             map[x][i] = elem.at(i); //read each string character
 
+            if (map[x][i] == '.')
+            {
+                g_Console.writeToBuffer(i, x, ' ', BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE | FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+            }
+            else if (map[x][i] == '#')
+            {
+                g_Console.writeToBuffer(i, x, '#', 0 | 0);
+            }
+            else if (map[x][i] == '?')
+            {
+                g_Console.writeToBuffer(i, x, '?', 0 | 0);
+            }
+            else if (map[x][i] == '!')
+            {
+                g_Console.writeToBuffer(i, x, '!', FOREGROUND_RED | BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE);
+            }
+            else if (map[x][i] == '+')
+            {
+                g_Console.writeToBuffer(i, x, '+', FOREGROUND_GREEN | BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE);
+            }
+            COORD c = g_Console.getConsoleSize();
+            c.Y = 22;
+            c.X = 7;
+            g_Console.writeToBuffer(c, "You find an entrance to a hidden cave-like structure and enter", 0x03);
         }
         x++;
     }
-    for (int x = 0; x < 300; x++)
+}
+    /*for (int x = 0; x <300; x++)
     {
         for (int y = 0; y < 300; y++)
         {
@@ -463,7 +503,7 @@ void loadlvl1()
             }
         }
     }
-}
+}*/
 
 void gameOver()
 {
@@ -631,7 +671,8 @@ void renderInputEvents()
       {
               if (g_skKeyEvent[K_SPACE].keyReleased)
               {
-                  g_bQuitGame = true;
+                  clearScreen(); 
+                  loadlvl2();
               }
             
 
