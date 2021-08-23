@@ -5,3 +5,5 @@ Release/
 *.suo
 *.user
 ipch/
+/.vs/SP1Framework/v16
+/.vs/Studio Project 1-3/v16

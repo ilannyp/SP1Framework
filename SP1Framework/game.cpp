@@ -6,6 +6,8 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
+#include <fstream>
+#include <string>
 
 double  g_dElapsedTime;
 double  g_dDeltaTime;
@@ -14,10 +16,13 @@ SMouseEvent g_mouseEvent;
 
 // Game specific variables here
 SGameChar   g_sChar;
+endDoor g_endDoor;
 EGAMESTATES g_eGameState = S_SPLASHSCREEN; // initial state
 
 // Console object
 Console g_Console(80, 25, "SP1 Framework");
+
+char map[300][300];
 
 //--------------------------------------------------------------
 // Purpose  : Initialisation function
@@ -36,6 +41,13 @@ void init( void )
 
     g_sChar.m_cLocation.X = g_Console.getConsoleSize().X / 2;
     g_sChar.m_cLocation.Y = g_Console.getConsoleSize().Y / 2;
+    /*
+    if (Map2 == true)
+    {
+        g_sChar.m_cLocation.X = 0;
+        g_sChar.m_cLocation.Y = g_Console.getConsoleSize().Y / 2;
+    }
+    */
     g_sChar.m_bActive = true;
     // sets the width, height and the font name to use in the console
     g_Console.setConsoleFont(0, 16, L"Consolas");
@@ -43,6 +55,9 @@ void init( void )
     // remember to set your keyboard handler, so that your functions can be notified of input events
     g_Console.setKeyboardHandler(keyboardHandler);
     g_Console.setMouseHandler(mouseHandler);
+
+    g_endDoor.location.X = 12;
+    g_endDoor.location.Y = 12;
 }
 
 //--------------------------------------------------------------
@@ -96,6 +111,7 @@ void getInput( void )
 //--------------------------------------------------------------
 void keyboardHandler(const KEY_EVENT_RECORD& keyboardEvent)
 {    
+    /*
     switch (g_eGameState)
     {
     case S_SPLASHSCREEN: // don't handle anything for the splash screen
@@ -103,6 +119,8 @@ void keyboardHandler(const KEY_EVENT_RECORD& keyboardEvent)
     case S_GAME: gameplayKBHandler(keyboardEvent); // handle gameplay keyboard event 
         break;
     }
+    */
+    gameplayKBHandler(keyboardEvent);
 }
 
 //--------------------------------------------------------------
@@ -152,6 +170,7 @@ void gameplayKBHandler(const KEY_EVENT_RECORD& keyboardEvent)
     case VK_LEFT: key = K_LEFT; break; 
     case VK_RIGHT: key = K_RIGHT; break; 
     case VK_SPACE: key = K_SPACE; break;
+    case VK_RETURN: key = K_ENTER; break;
     case VK_ESCAPE: key = K_ESCAPE; break; 
     }
     // a key pressed event would be one with bKeyDown == true
@@ -183,6 +202,18 @@ void gameplayMouseHandler(const MOUSE_EVENT_RECORD& mouseEvent)
     g_mouseEvent.buttonState = mouseEvent.dwButtonState;
     g_mouseEvent.eventFlags = mouseEvent.dwEventFlags;
 }
+
+void renderEndDoor()
+{
+    WORD colour = 0x1A;
+    g_Console.writeToBuffer(g_endDoor.location, (char)1, colour);
+}
+
+/*void renderMap2()
+{
+
+}
+*/
 
 //--------------------------------------------------------------
 // Purpose  : Update function
@@ -216,7 +247,7 @@ void update(double dt)
 
 void splashScreenWait()    // waits for time to pass in splash screen
 {
-    if (g_dElapsedTime > 3.0) // wait for 3 seconds to switch to game mode, else do nothing
+    if (g_skKeyEvent[K_ENTER].keyReleased)
         g_eGameState = S_GAME;
 }
 
@@ -230,26 +261,36 @@ void updateGame()       // gameplay logic
 void moveCharacter()
 {    
     // Updating the location of the character based on the key release
-    // providing a beep sound whenver we shift the character
-    if (g_skKeyEvent[K_UP].keyReleased && g_sChar.m_cLocation.Y > 0)
+
+    
+    
+    if (g_skKeyEvent[K_UP].keyDown && g_sChar.m_cLocation.Y > 0)
     {
-        //Beep(1440, 30);
-        g_sChar.m_cLocation.Y--;       
+        if (map[g_sChar.m_cLocation.Y - 1][g_sChar.m_cLocation.X] != '#')
+        {
+            g_sChar.m_cLocation.Y--;
+        }
     }
-    if (g_skKeyEvent[K_LEFT].keyReleased && g_sChar.m_cLocation.X > 0)
+    if (g_skKeyEvent[K_LEFT].keyDown && g_sChar.m_cLocation.X > 0)
     {
-        //Beep(1440, 30);
-        g_sChar.m_cLocation.X--;        
+        if (map[g_sChar.m_cLocation.Y][g_sChar.m_cLocation.X - 1] != '#')
+        {
+            g_sChar.m_cLocation.X--;
+        }
     }
-    if (g_skKeyEvent[K_DOWN].keyReleased && g_sChar.m_cLocation.Y < g_Console.getConsoleSize().Y - 1)
+    if (g_skKeyEvent[K_DOWN].keyDown && g_sChar.m_cLocation.Y < g_Console.getConsoleSize().Y - 1)
     {
-        //Beep(1440, 30);
-        g_sChar.m_cLocation.Y++;        
+        if (map[g_sChar.m_cLocation.Y + 1][g_sChar.m_cLocation.X] != '#')
+        {
+            g_sChar.m_cLocation.Y++;
+        }
     }
-    if (g_skKeyEvent[K_RIGHT].keyReleased && g_sChar.m_cLocation.X < g_Console.getConsoleSize().X - 1)
+    if (g_skKeyEvent[K_RIGHT].keyDown && g_sChar.m_cLocation.X < g_Console.getConsoleSize().X - 1)
     {
-        //Beep(1440, 30);
-        g_sChar.m_cLocation.X++;        
+        if (map[g_sChar.m_cLocation.Y][g_sChar.m_cLocation.X + 1] != '#')
+        {
+            g_sChar.m_cLocation.X++;
+        }
     }
     if (g_skKeyEvent[K_SPACE].keyReleased)
     {
@@ -260,6 +301,11 @@ void moveCharacter()
 }
 void processUserInput()
 {
+    /*if (g_skKeyEvent[K_SPACE].keyReleased && g_sChar.m_cLocation.X == g_endDoor.location.X && g_sChar.m_cLocation.Y == g_endDoor.location.Y)
+    {
+        Map2 = true;
+    }
+    */
     // quits the game if player hits the escape key
     if (g_skKeyEvent[K_ESCAPE].keyReleased)
         g_bQuitGame = true;    
@@ -302,41 +348,195 @@ void renderToScreen()
 
 void renderSplashScreen()  // renders the splash screen
 {
+    std::fstream inFile;
+    inFile.open("titlescreen.txt");
+    if (inFile.fail())
+    {
+        std::cerr << "Error";
+        exit(1);
+    }
+    std::string elem;
+    char title[128][128];
+    int y = 0;
+    while (getline(inFile, elem)) //get file by string
+    {
+        for (unsigned i = 0; i < elem.length(); ++i)
+        {
+            title[y][i] = elem.at(i); //read each string character
+     
+        }
+        y++;
+    }
+    for (int y = 0; y < 7; y++)
+    {
+        for (int x = 0; x < 128; x++)
+        {
+            if (title[y][x] == '|')
+            {
+                g_Console.writeToBuffer(x, y, '|');
+            }
+            if (title[y][x] == '_')
+            {
+                g_Console.writeToBuffer(x, y, '_');
+            }
+            if (title[y][x] == '/')
+            {
+                g_Console.writeToBuffer(x, y, '/');
+            }
+            if (title[y][x] == '.')
+            {
+                g_Console.writeToBuffer(x, y, '.');
+            }
+            if (title[y][x] == '>')
+            {
+                g_Console.writeToBuffer(x, y, '>');
+            }
+            if (title[y][x] == '(')
+            {
+                g_Console.writeToBuffer(x, y, '(');
+            }
+        }
+    }
     COORD c = g_Console.getConsoleSize();
     c.Y /= 3;
-    c.X = c.X / 2 - 9;
-    g_Console.writeToBuffer(c, "A game in 3 seconds", 0x03);
-    c.Y += 1;
-    c.X = g_Console.getConsoleSize().X / 2 - 20;
-    g_Console.writeToBuffer(c, "Press <Space> to change character colour", 0x09);
-    c.Y += 1;
-    c.X = g_Console.getConsoleSize().X / 2 - 9;
-    g_Console.writeToBuffer(c, "Press 'Esc' to quit", 0x09);
+    c.X = c.X / 2 - 5;
+    g_Console.writeToBuffer(c, "Start", 0x03);
 }
 
 void renderGame()
 {
     renderMap();        // renders the map to the buffer first
     renderCharacter();  // renders the character into the buffer
+    renderEndDoor();    // renders the door to next stage
+}
+
+void loadlvl1()
+{
+    std::fstream inFile;
+    inFile.open("lvl1");
+
+    //Error check
+    if (inFile.fail())
+    {
+        std::cerr << "Error";
+        exit(1);
+    }
+
+    std::string elem;
+    // Init and store Map
+    
+    int x = 0;
+    while (getline(inFile, elem)) //get file by string
+    {
+        for (unsigned i = 0; i < elem.length(); ++i)
+        {
+            map[x][i] = elem.at(i); //read each string character
+
+        }
+        x++;
+    }
+    for (int x = 0; x < 300; x++)
+    {
+        for (int y = 0; y < 300; y++)
+        {
+            if (map[x][y] == '.')
+            {
+                g_Console.writeToBuffer(y, x, ' ', BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE | FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+            }
+            else if (map[x][y] == '#')
+            {
+                g_Console.writeToBuffer(y, x , '#', 0 | 0);
+            }
+            else if (map[x][y] == '?')
+            {
+                g_Console.writeToBuffer(y, x, '?', 0 | 0);
+            }
+            else if (map[x][y] == '!')
+            {
+                g_Console.writeToBuffer(y, x, '!', FOREGROUND_RED | BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE);
+            }
+            else if (map[x][y] == '+')
+            {
+                g_Console.writeToBuffer(y, x, '+', FOREGROUND_GREEN | BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE);
+            }
+        }
+    }
+}
+
+void walls(int x, int y)
+{
+    
+    
+    
+}
+
+void loadlvl2()
+{
+    std::fstream inFile;
+    inFile.open("lvl2");
+
+    //Error check
+    if (inFile.fail())
+    {
+        std::cerr << "Error";
+        exit(1);
+    }
+
+    std::string elem;
+    // Init and store Map
+    int x = 0;
+    while (getline(inFile, elem)) //get file by string
+    {
+        for (unsigned i = 0; i < elem.length(); ++i)
+        {
+            map[x][i] = elem.at(i); //read each string character
+
+        }
+        x++;
+
+    }
+    for (int x = 0; x < 300; x++)
+    {
+        for (int y = 0; y < 300; y++)
+        {
+            if (map[x][y] == '.')
+            {
+                g_Console.writeToBuffer(y, x, ' ', BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE | FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+            }
+            else if (map[x][y] == '#')
+            {
+                g_Console.writeToBuffer(y, x, '#', 0 | 0);
+            }
+            else if (map[x][y] == '?')
+            {
+                g_Console.writeToBuffer(y, x, '?', 0 | 0);
+            }
+            else if (map[x][y] == '!')
+            {
+                g_Console.writeToBuffer(y, x, '!', FOREGROUND_RED | BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE);
+            }
+            else if (map[x][y] == '+')
+            {
+                g_Console.writeToBuffer(y, x, '+', FOREGROUND_GREEN | BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE);
+            }
+        }
+    }
 }
 
 void renderMap()
 {
-    // Set up sample colours, and output shadings
-    const WORD colors[] = {
-        0x1A, 0x2B, 0x3C, 0x4D, 0x5E, 0x6F,
-        0xA1, 0xB2, 0xC3, 0xD4, 0xE5, 0xF6
-    };
-
-    COORD c;
-    for (int i = 0; i < 12; ++i)
+    if (!Map2)
     {
-        c.X = 5 * i;
-        c.Y = i + 1;
-        colour(colors[i]);
-        g_Console.writeToBuffer(c, " °±²Û", colors[i]);
+        loadlvl1();
+    }
+    else if (Map2)
+    {
+        loadlvl2();
     }
 }
+            
+        
+        
 
 void renderCharacter()
 {
@@ -346,7 +546,13 @@ void renderCharacter()
     {
         charColor = 0x0A;
     }
-    g_Console.writeToBuffer(g_sChar.m_cLocation, (char)1, charColor);
+    /*if (Map2 = true)
+    {
+        g_sChar.m_cLocation.X = 0;
+        g_sChar.m_cLocation.Y = g_Console.getConsoleSize().Y / 2;
+    }
+    */
+    g_Console.writeToBuffer(g_sChar.m_cLocation, (char)1, charColor); 
 }
 
 void renderFramerate()
@@ -372,75 +578,13 @@ void renderFramerate()
 void renderInputEvents()
 {
     // keyboard events
-    COORD startPos = {50, 2};
     std::ostringstream ss;
-    std::string key;
-    for (int i = 0; i < K_COUNT; ++i)
-    {
-        ss.str("");
-        switch (i)
-        {
-        case K_UP: key = "UP";
-            break;
-        case K_DOWN: key = "DOWN";
-            break;
-        case K_LEFT: key = "LEFT";
-            break;
-        case K_RIGHT: key = "RIGHT";
-            break;
-        case K_SPACE: key = "SPACE";
-            break;
-        default: continue;
-        }
-        if (g_skKeyEvent[i].keyDown)
-            ss << key << " pressed";
-        else if (g_skKeyEvent[i].keyReleased)
-            ss << key << " released";
-        else
-            ss << key << " not pressed";
-
-        COORD c = { startPos.X, startPos.Y + i };
-        g_Console.writeToBuffer(c, ss.str(), 0x17);
-    }
 
     // mouse events    
     ss.str("");
     ss << "Mouse position (" << g_mouseEvent.mousePosition.X << ", " << g_mouseEvent.mousePosition.Y << ")";
     g_Console.writeToBuffer(g_mouseEvent.mousePosition, ss.str(), 0x59);
-    ss.str("");
-    switch (g_mouseEvent.eventFlags)
-    {
-    case 0:
-        if (g_mouseEvent.buttonState == FROM_LEFT_1ST_BUTTON_PRESSED)
-        {
-            ss.str("Left Button Pressed");
-            g_Console.writeToBuffer(g_mouseEvent.mousePosition.X, g_mouseEvent.mousePosition.Y + 1, ss.str(), 0x59);
-        }
-        else if (g_mouseEvent.buttonState == RIGHTMOST_BUTTON_PRESSED)
-        {
-            ss.str("Right Button Pressed");
-            g_Console.writeToBuffer(g_mouseEvent.mousePosition.X, g_mouseEvent.mousePosition.Y + 2, ss.str(), 0x59);
-        }
-        else
-        {
-            ss.str("Some Button Pressed");
-            g_Console.writeToBuffer(g_mouseEvent.mousePosition.X, g_mouseEvent.mousePosition.Y + 3, ss.str(), 0x59);
-        }
-        break;
-    case DOUBLE_CLICK:
-        ss.str("Double Clicked");
-        g_Console.writeToBuffer(g_mouseEvent.mousePosition.X, g_mouseEvent.mousePosition.Y + 4, ss.str(), 0x59);
-        break;        
-    case MOUSE_WHEELED:
-        if (g_mouseEvent.buttonState & 0xFF000000)
-            ss.str("Mouse wheeled down");
-        else
-            ss.str("Mouse wheeled up");
-        g_Console.writeToBuffer(g_mouseEvent.mousePosition.X, g_mouseEvent.mousePosition.Y + 5, ss.str(), 0x59);
-        break;
-    default:        
-        break;
-    }
+ 
     
 }
 

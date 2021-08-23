@@ -5,6 +5,7 @@
 
 extern CStopWatch g_swTimer;
 extern bool g_bQuitGame;
+extern bool Map2;
 
 // struct to store keyboard events
 // a small subset of KEY_EVENT_RECORD
@@ -32,6 +33,7 @@ enum EKEYS
     K_RIGHT,
     K_ESCAPE,
     K_SPACE,
+    K_ENTER,
     K_COUNT
 };
 
@@ -40,6 +42,7 @@ enum EGAMESTATES
 {
     S_SPLASHSCREEN,
     S_GAME,
+    S_Map2,
     S_COUNT
 };
 
@@ -48,6 +51,11 @@ struct SGameChar
 {
     COORD m_cLocation;
     bool  m_bActive;
+};
+
+struct endDoor
+{
+    COORD location;
 };
 
 void init        ( void );      // initialize your variables, allocate memory, etc
@@ -76,5 +84,8 @@ void mouseHandler(const MOUSE_EVENT_RECORD& mouseEvent);      // define this fun
 void gameplayKBHandler(const KEY_EVENT_RECORD& keyboardEvent);   // handles keyboard events for gameplay 
 void gameplayMouseHandler(const MOUSE_EVENT_RECORD& mouseEvent); // handles mouse events for gameplay 
 
-
+void renderEndDoor();
+void loadlvl1();
+void walls(int x, int y);
+void loadlvl2();
 #endif // _GAME_H
