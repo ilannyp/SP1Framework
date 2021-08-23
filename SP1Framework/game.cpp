@@ -56,8 +56,7 @@ void init( void )
     g_Console.setKeyboardHandler(keyboardHandler);
     g_Console.setMouseHandler(mouseHandler);
 
-    g_endDoor.location.X = 12;
-    g_endDoor.location.Y = 12;
+ 
 }
 
 //--------------------------------------------------------------
@@ -202,10 +201,13 @@ void gameplayMouseHandler(const MOUSE_EVENT_RECORD& mouseEvent)
     g_mouseEvent.buttonState = mouseEvent.dwButtonState;
     g_mouseEvent.eventFlags = mouseEvent.dwEventFlags;
 }
-void renderDoor()
+void renderDoor(double x, double y)
 {
     WORD doorColor = 0x0F;
     g_Console.writeToBuffer(g_dDoor.m_dLocation,(char)48, doorColor);
+    g_dDoor.m_dLocation.X = x;
+    g_dDoor.m_dLocation.Y = y;
+
 }
 
 
@@ -421,7 +423,7 @@ void renderGame()
 {
     renderMap();        // renders the map to the buffer first
     renderCharacter();  // renders the character into the buffer
-    renderDoor();  //renders door to go to the next level
+    renderDoor(21,20);  //renders door to go to the next level
     
 }
 
@@ -645,7 +647,8 @@ void renderInputEvents()
       {
               if (g_skKeyEvent[K_SPACE].keyReleased)
               {
-                  g_bQuitGame = true;
+                  clearScreen(); 
+                  loadlvl2();
               }
             
 
