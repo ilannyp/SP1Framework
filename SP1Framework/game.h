@@ -52,6 +52,10 @@ struct SGameChar
     COORD m_cLocation;
     bool  m_bActive;
 };
+struct SGameDoor
+{
+    COORD m_dLocation;
+};
 
 struct endDoor
 {
@@ -88,4 +92,5 @@ void renderEndDoor();
 void loadlvl1();
 void loadlvl2();
 void gameOver();
+#endif // _GAME_H
 #endif // _GAME_H
