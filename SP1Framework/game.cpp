@@ -255,15 +255,11 @@ void updateGame()       // gameplay logic
 {
     processUserInput(); // checks if you should change states or do something else with the game, e.g. pause, exit
     moveCharacter();    // moves the character, collision detection, physics, etc
-                        // sound can be played here too.
+    
 }
 
 void moveCharacter()
 {    
-    // Updating the location of the character based on the key release
-
-    
-    
     if (g_skKeyEvent[K_UP].keyDown && g_sChar.m_cLocation.Y > 0)
     {
         if (map[g_sChar.m_cLocation.Y - 1][g_sChar.m_cLocation.X] != '#')
@@ -296,7 +292,10 @@ void moveCharacter()
     {
         g_sChar.m_bActive = !g_sChar.m_bActive;        
     }
-
+    if (g_sChar.m_cLocation.X == '!' && g_sChar.m_cLocation.Y == '!')
+    {
+        gameOver();
+    }
    
 }
 void processUserInput()
@@ -332,6 +331,7 @@ void render()
     renderFramerate();      // renders debug information, frame rate, elapsed time, etc
     renderInputEvents();    // renders status of input events
     renderToScreen();       // dump the contents of the buffer to the screen, one frame worth of game
+
 }
 
 void clearScreen()
@@ -466,8 +466,47 @@ void loadlvl1()
 void gameOver()
 {
     clearScreen();
-    
-    
+    COORD c;
+    COORD retry;
+    COORD quit;
+
+    bool again = true;
+    c.X = 33;
+    c.Y = 8;
+    g_Console.writeToBuffer(c, "Game Over");
+    retry.X = 35;
+    retry.Y = 12;
+    g_Console.writeToBuffer(retry, "Retry");
+    quit.X = 35;
+    quit.Y = 15;
+    g_Console.writeToBuffer(quit, "Quit");
+
+    if (g_skKeyEvent[K_UP].keyReleased)
+    {
+        again = true;
+    }
+    if (g_skKeyEvent[K_DOWN].keyReleased)
+    {
+        again = false;
+    }
+    if (again = true)
+    {
+        g_Console.writeToBuffer(retry, "Retry", BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE);
+        if (g_skKeyEvent[K_ENTER].keyDown)
+        {
+            renderGame();
+        }
+    }
+    else
+    {
+        g_Console.writeToBuffer(quit, "Quit", BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE);
+        {
+            if (g_skKeyEvent[K_ENTER].keyDown)
+            {
+                shutdown();
+            }
+        }
+    }
 }
 
 void loadlvl2()

@@ -42,7 +42,6 @@ enum EGAMESTATES
 {
     S_SPLASHSCREEN,
     S_GAME,
-    S_Map2,
     S_COUNT
 };
 
@@ -92,5 +91,4 @@ void renderEndDoor();
 void loadlvl1();
 void loadlvl2();
 void gameOver();
-#endif // _GAME_H
 #endif // _GAME_H
