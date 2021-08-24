@@ -431,6 +431,7 @@ void loadlvl1()
     std::fstream inFile;
     inFile.open("lvl1");
 
+
     //Error check
     if (inFile.fail())
     {
@@ -440,6 +441,17 @@ void loadlvl1()
 
     std::string elem;
     // Init and store Map
+    COORD c = g_Console.getConsoleSize();
+  /*c.Y = 22;
+    c.X = 7;
+    g_Console.writeToBuffer(c, "You find an entrance to a hidden cave-like structure and enter", 0x03);
+    c.X = nx;
+    c.Y = ny;
+    g_Console.writeToBuffer(c, "Player: This place looks promising", 0x03);
+    c.X = nx;
+    c.Y = ny+1;
+    g_Console.writeToBuffer(c, "The treasure is close now you can feel it", 0x03);*/
+
 
     int x = 0;
     while (getline(inFile, elem)) //get file by string
@@ -468,10 +480,6 @@ void loadlvl1()
             {
                 g_Console.writeToBuffer(i, x, '+', FOREGROUND_GREEN | BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE);
             }
-            COORD c = g_Console.getConsoleSize();
-            c.Y = 22;
-            c.X = 7;
-            g_Console.writeToBuffer(c, "You find an entrance to a hidden cave-like structure and enter", 0x03);
         }
         x++;
     }
@@ -583,7 +591,14 @@ void loadlvl2()
         x++;
 
     }
-    for (int x = 0; x < 300; x++)
+    COORD c = g_Console.getConsoleSize();
+   /* c.Y = nx;
+    c.X = ny;
+    g_Console.writeToBuffer(c, "Player:I just wanted some treasure man..", 0x03);
+    c.X = nx;
+    c.Y = ny;
+    g_Console.writeToBuffer(c, "As you enter the second level a strange feeling passes over you almost as if someone is watching you.", 0x03);
+    for (int x = 0; x < 300; x++)*/
     {
         for (int y = 0; y < 300; y++)
         {
