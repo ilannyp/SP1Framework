@@ -496,7 +496,6 @@ void renderGame()
     }
     
 
-=======
     if (map[g_sChar.m_cLocation.Y][g_sChar.m_cLocation.X] == '!')
     {
         alive = false;
@@ -505,7 +504,7 @@ void renderGame()
         renderMap();        // renders the map to the buffer first
         renderCharacter();  // renders the character into the buffer
         renderDoor(21, 20);  //renders door to go to the next level
->>>>>>> 53777cfccc07e16c04a952134b36728822f68857
+
     
 }
 
