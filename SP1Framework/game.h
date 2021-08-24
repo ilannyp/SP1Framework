@@ -5,6 +5,7 @@
 
 extern CStopWatch g_swTimer;
 extern bool g_bQuitGame;
+extern bool story;
 extern bool Map2;
 
 // struct to store keyboard events
@@ -85,6 +86,9 @@ void gameplayMouseHandler(const MOUSE_EVENT_RECORD& mouseEvent); // handles mous
 
 void renderEndDoor();
 void loadlvl1();
+void lvl1TXT();
+void lvl1TXTclear();
 void walls(int x, int y);
 void loadlvl2();
+
 #endif // _GAME_H
