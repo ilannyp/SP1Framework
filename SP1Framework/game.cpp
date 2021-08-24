@@ -3,22 +3,30 @@
 //
 #include "game.h"
 #include "Framework\console.h"
+#include "Enemy.h"
+#include "Player.h"
+#include "Entity.h"
 #include <iostream>
 #include <iomanip>
 #include <sstream>
 #include <fstream>
 #include <string>
+#include <stdlib.h>
+#include "gameItem.h"
 
 double  g_dElapsedTime;
 double  g_dDeltaTime;
+int instance;
 SKeyEvent g_skKeyEvent[K_COUNT];
 SMouseEvent g_mouseEvent;
 
 // Game specific variables here
 SGameChar   g_sChar;
 SGameDoor   g_dDoor;
-EGAMESTATES g_eGameState = S_SPLASHSCREEN; // initial state
 
+EGAMESTATES g_eGameState = S_SPLASHSCREEN; // initial state
+Entity* CEntities[6];
+gameItem * NoOfItems[5];
 // Console object
 Console g_Console(80, 25, "SP1 Framework");
 
@@ -33,6 +41,18 @@ char map[300][300];
 //--------------------------------------------------------------
 void init( void )
 {
+    instance = 0;
+    CEntities[0] = new Player("NoobMaster69", 100, 15, 10, true, true, true);
+    CEntities[1] = new Enemy("Sea Crab", 47, 10, 10, true);
+    CEntities[2] = new Enemy("Baby Shark", 21, 20, 10, true);
+    CEntities[3] = new Enemy("Wizard Frog", 70, 32, 10, true);
+    CEntities[4] = new Enemy("Dragon", 65, 40, 10, true);
+    CEntities[5] = new Enemy("Alien", 100, 35, 10, true);
+
+    NoOfItems[0] = new gameItem("Trident", 4, 0, 0, 36, 18, true);
+    NoOfItems[1] = new gameItem("Jordans", 0, 4, 0, 24, 6, true);
+    NoOfItems[2] = new gameItem("HP up", 0, 0, 20, 21, 9, true);
+
     // Set precision for floating point output
     g_dElapsedTime = 0.0;    
 
@@ -55,6 +75,7 @@ void init( void )
     // remember to set your keyboard handler, so that your functions can be notified of input events
     g_Console.setKeyboardHandler(keyboardHandler);
     g_Console.setMouseHandler(mouseHandler);
+    
 
  
 }
@@ -201,13 +222,40 @@ void gameplayMouseHandler(const MOUSE_EVENT_RECORD& mouseEvent)
     g_mouseEvent.buttonState = mouseEvent.dwButtonState;
     g_mouseEvent.eventFlags = mouseEvent.dwEventFlags;
 }
-void renderDoor(double x, double y)
+void renderDoor(int x, int y)
 {
     WORD doorColor = 0x0F;
     g_Console.writeToBuffer(g_dDoor.m_dLocation,(char)48, doorColor);
     g_dDoor.m_dLocation.X = x;
     g_dDoor.m_dLocation.Y = y;
 
+}
+void renderItem()
+{
+    WORD itemColor = 0x2B;
+    srand(time(NULL));
+    int itemGen = rand() % 3 + 1;
+
+
+   
+    if (itemGen == 1)
+    {
+        instance = 1;
+       g_Console.writeToBuffer(NoOfItems[0]->getX(), NoOfItems[0]->getY(), (char)48, itemColor);
+    }
+    else if (itemGen == 2)
+    {
+        instance = 2;
+        g_Console.writeToBuffer(NoOfItems[1]->getX(), NoOfItems[1]->getY(), (char)47, itemColor);
+    }
+    else if (itemGen == 3)
+    {
+        instance = 3;
+        g_Console.writeToBuffer(NoOfItems[2]->getX(), NoOfItems[2]->getY(), (char)46, itemColor);
+    }
+  
+    
+    
 }
 
 
@@ -421,9 +469,24 @@ void renderSplashScreen()  // renders the splash screen
 
 void renderGame()
 {
-    renderMap();        // renders the map to the buffer first
-    renderCharacter();  // renders the character into the buffer
-    renderDoor(21,20);  //renders door to go to the next level
+    if (NoOfItems[0]->getActivity() == true ||
+        NoOfItems[1]->getActivity() == true ||
+        NoOfItems[2]->getActivity() == true) 
+    {
+        renderMap();        // renders the map to the buffer first
+        renderCharacter();  // renders the character into the buffer
+        renderDoor(35, 22);  //renders door to go to the next level
+        renderItem();
+    }
+    else 
+    {
+        renderMap();
+        renderCharacter();
+        renderDoor(35, 22);
+
+    }
+    
+
     
 }
 
@@ -653,6 +716,29 @@ void renderInputEvents()
             
 
       }
+    if ((g_sChar.m_cLocation.X ==  NoOfItems[0]->getX() && g_sChar.m_cLocation.Y == NoOfItems[0]->getY()) ||
+        (g_sChar.m_cLocation.X == NoOfItems[1]->getX() && g_sChar.m_cLocation.Y == NoOfItems[1]->getY())||
+        (g_sChar.m_cLocation.X == NoOfItems[2]->getX() && g_sChar.m_cLocation.Y == NoOfItems[2]->getY()))
+    {
+        //if (g_skKeyEvent[K_SPACE].keyReleased)
+        //{
+            switch (instance) {
+            case 1:
+                NoOfItems[0]->~gameItem();
+                delete NoOfItems[0];
+                NoOfItems[0]->setActivity(false);
+            case 2:
+                NoOfItems[1]->~gameItem();
+                delete NoOfItems[1];
+                NoOfItems[1]->setActivity(false);
+            case 3:
+                NoOfItems[2]->~gameItem();
+                delete NoOfItems[2];
+                NoOfItems[2]->setActivity(false);
+            }
+           
+       // }
+    }
     
 }
 
