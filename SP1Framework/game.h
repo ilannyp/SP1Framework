@@ -7,6 +7,8 @@ extern CStopWatch g_swTimer;
 extern bool g_bQuitGame;
 extern bool Map1;
 extern bool Map2;
+extern bool alive;
+
 
 // struct to store keyboard events
 // a small subset of KEY_EVENT_RECORD
@@ -57,7 +59,6 @@ struct SGameDoor
 {
     COORD m_dLocation;
 };
-
 void init        ( void );      // initialize your variables, allocate memory, etc
 void getInput    ( void );      // get input from player
 void update      ( double dt ); // update the game and the state of the game
@@ -88,4 +89,6 @@ void loadlvl1();
 void loadlvl2();
 void gameOver();
 void triggerGameOver();
+void selectRetry();
+void selectQuit();
 #endif // _GAME_H

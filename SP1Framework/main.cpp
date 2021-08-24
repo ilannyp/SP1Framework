@@ -7,6 +7,7 @@ CStopWatch g_Timer;                            // Timer function to keep track o
 bool g_bQuitGame = false;                    // Set to true if you want to quit the game
 bool Map1 = true;
 bool Map2 = false;
+bool alive = true;
 const unsigned char gc_ucFPS = 100;                // FPS of this game
 const unsigned int gc_uFrameTime = 1000 / gc_ucFPS;    // time for each frame
 

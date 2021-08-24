@@ -20,8 +20,9 @@ SGameDoor   g_dDoor;
 EGAMESTATES g_eGameState = S_SPLASHSCREEN; // initial state
 
 // Console object
-Console g_Console(80, 25, "SP1 Framework");
-
+Console g_Console(125, 100, "SP1 Framework");
+bool retrySelected = true;
+bool quitSelected = false;
 char map[300][300];
 
 //--------------------------------------------------------------
@@ -39,8 +40,8 @@ void init( void )
     // sets the initial state for the game
     g_eGameState = S_SPLASHSCREEN;
 
-    g_sChar.m_cLocation.X = g_Console.getConsoleSize().X / 2;
-    g_sChar.m_cLocation.Y = g_Console.getConsoleSize().Y / 2;
+    g_sChar.m_cLocation.X = 4;
+    g_sChar.m_cLocation.Y = 4;
     /*
     if (Map2 == true)
     {
@@ -295,6 +296,10 @@ void moveCharacter()
     {
         g_sChar.m_bActive = !g_sChar.m_bActive;        
     }
+    if (map[g_sChar.m_cLocation.Y][g_sChar.m_cLocation.X] == '!')
+    {
+        alive = false;
+    }
 }
 void processUserInput()
 {
@@ -396,8 +401,8 @@ void renderSplashScreen()  // renders the splash screen
         }
     }
     COORD c = g_Console.getConsoleSize();
-    c.Y /= 3;
-    c.X = c.X / 2 - 5;
+    c.Y = 10;
+    c.X = 35;
     g_Console.writeToBuffer(c, "Start", 0x03);
 
     c.Y = 18;
@@ -417,13 +422,13 @@ void renderSplashScreen()  // renders the splash screen
 void renderGame()
 {
     
-    renderMap();        // renders the map to the buffer first
-    renderCharacter();  // renders the character into the buffer
-    renderDoor(21,20);  //renders door to go to the next level
-    if (map[g_sChar.m_cLocation.Y][g_sChar.m_cLocation.X] == '!')
+    if (alive)
     {
-        triggerGameOver();
+        renderMap();        // renders the map to the buffer first
+        renderCharacter();  // renders the character into the buffer
+        renderDoor(21, 20);  //renders door to go to the next level
     }
+    triggerGameOver();
 }
 
 void loadlvl1()
@@ -441,7 +446,7 @@ void loadlvl1()
 
     std::string elem;
     // Init and store Map
-    COORD c = g_Console.getConsoleSize();
+    COORD c;
   /*c.Y = 22;
     c.X = 7;
     g_Console.writeToBuffer(c, "You find an entrance to a hidden cave-like structure and enter", 0x03);
@@ -514,11 +519,10 @@ void loadlvl1()
 
 void gameOver()
 {
-    
+    retrySelected = true;
     COORD c;
     COORD retry;
     COORD quit;
-    bool again = true;
     c.X = 33;
     c.Y = 8;
     g_Console.writeToBuffer(c, "Game Over");
@@ -528,42 +532,62 @@ void gameOver()
     quit.X = 35;
     quit.Y = 15;
     g_Console.writeToBuffer(quit, "Quit");
-    if (g_skKeyEvent[K_UP].keyReleased)
+    g_Console.writeToBuffer(retry, "Retry", BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE);
+    if (g_skKeyEvent[K_ENTER].keyReleased)
     {
-        again = true;
+        Map1 = true;
+        alive = true;
+        init();
+        g_eGameState = S_GAME;
     }
+    
     if (g_skKeyEvent[K_DOWN].keyReleased)
     {
-        again = false;
+        quitSelected = true;
+        retrySelected = false;
+        selectQuit();
     }
-    if (again = true)
-    {
-        g_Console.writeToBuffer(retry, "Retry", BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE);
-        if (g_skKeyEvent[K_ENTER].keyReleased)
-        {
-            Map1 = true;
-            init();
-            g_eGameState = S_GAME;
-        }
-    }
-    if (!again)
-    {
-        g_Console.writeToBuffer(quit, "Quit", BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE);
-        {
-            if (g_skKeyEvent[K_ENTER].keyReleased)
-            {
-                g_bQuitGame = true;
-            }
-        }
-    } 
 }
 
 void triggerGameOver()
 {
-   
+    alive = false;
     Map1 = false;
     clearScreen();
-    gameOver();
+    if (retrySelected)
+        gameOver();
+    if (quitSelected)
+        selectQuit();
+}
+
+void selectRetry()
+{
+
+}
+
+void selectQuit()
+{
+    COORD c;
+    COORD retry;
+    COORD quit;
+    c.X = 33;
+    c.Y = 8;
+    g_Console.writeToBuffer(c, "Game Over");
+    retry.X = 35;
+    retry.Y = 12;
+    g_Console.writeToBuffer(retry, "Retry");
+    quit.X = 35;
+    quit.Y = 15;
+    g_Console.writeToBuffer(quit, "Quit", BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE);
+    if (g_skKeyEvent[K_ENTER].keyReleased)
+    {
+        g_bQuitGame = true;
+    }
+    if (g_skKeyEvent[K_UP].keyReleased)
+    {
+        retrySelected = true;
+        quitSelected = false;
+    }
 }
 
 void loadlvl2()
@@ -579,7 +603,6 @@ void loadlvl2()
     }
 
     std::string elem;
-    // Init and store Map
     int x = 0;
     while (getline(inFile, elem)) //get file by string
     {
@@ -587,9 +610,28 @@ void loadlvl2()
         {
             map[x][i] = elem.at(i); //read each string character
 
+            if (map[x][i] == '.')
+            {
+                g_Console.writeToBuffer(i, x, ' ', BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE | FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+            }
+            else if (map[x][i] == '#')
+            {
+                g_Console.writeToBuffer(i, x, '#', 0 | 0);
+            }
+            else if (map[x][i] == '?')
+            {
+                g_Console.writeToBuffer(i, x, '?', 0 | 0);
+            }
+            else if (map[x][i] == '!')
+            {
+                g_Console.writeToBuffer(i, x, '!', FOREGROUND_RED | BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE);
+            }
+            else if (map[x][i] == '+')
+            {
+                g_Console.writeToBuffer(i, x, '+', FOREGROUND_GREEN | BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE);
+            }
         }
         x++;
-
     }
     COORD c = g_Console.getConsoleSize();
    /* c.Y = nx;
@@ -597,33 +639,7 @@ void loadlvl2()
     g_Console.writeToBuffer(c, "Player:I just wanted some treasure man..", 0x03);
     c.X = nx;
     c.Y = ny;
-    g_Console.writeToBuffer(c, "As you enter the second level a strange feeling passes over you almost as if someone is watching you.", 0x03);
-    for (int x = 0; x < 300; x++)*/
-    {
-        for (int y = 0; y < 300; y++)
-        {
-            if (map[x][y] == '.')
-            {
-                g_Console.writeToBuffer(y, x, ' ', BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE | FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
-            }
-            else if (map[x][y] == '#')
-            {
-                g_Console.writeToBuffer(y, x, '#', 0 | 0);
-            }
-            else if (map[x][y] == '?')
-            {
-                g_Console.writeToBuffer(y, x, '?', 0 | 0);
-            }
-            else if (map[x][y] == '!')
-            {
-                g_Console.writeToBuffer(y, x, '!', FOREGROUND_RED | BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE);
-            }
-            else if (map[x][y] == '+')
-            {
-                g_Console.writeToBuffer(y, x, '+', FOREGROUND_GREEN | BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE);
-            }
-        }
-    }
+    g_Console.writeToBuffer(c, "As you enter the second level a strange feeling passes over you almost as if someone is watching you.", 0x03); */
 }
 
 void renderMap()
@@ -656,7 +672,7 @@ void renderCharacter()
         g_sChar.m_cLocation.Y = g_Console.getConsoleSize().Y / 2;
     }
     */
-    g_Console.writeToBuffer(g_sChar.m_cLocation, (char)1, charColor); 
+    g_Console.writeToBuffer(g_sChar.m_cLocation, (char)1, charColor ); 
 }
 
 void renderFramerate()
@@ -694,8 +710,10 @@ void renderInputEvents()
       {
               if (g_skKeyEvent[K_SPACE].keyReleased)
               {
-                  clearScreen(); 
-                  loadlvl2();
+                  clearScreen();
+                  Map1 = false;
+                  Map2 = true;
+                  
               }
             
 
