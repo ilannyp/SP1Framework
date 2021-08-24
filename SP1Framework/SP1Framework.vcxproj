@@ -96,6 +96,7 @@
     <None Include="lvl2" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="lvl1part2.txt" />
     <Text Include="titlescreen.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -19,6 +19,7 @@ SMouseEvent g_mouseEvent;
 SGameChar   g_sChar;
 SGameDoor   g_dDoor;
 EGAMESTATES g_eGameState = S_SPLASHSCREEN; // initial state
+MAPSTATE StateOfMap = lvl1;
 
 // Console object
 Console g_Console(125, 100, "SP1 Framework");
@@ -43,9 +44,9 @@ void init( void )
 
     // sets the initial state for the game
     g_eGameState = S_SPLASHSCREEN;
-
+    StateOfMap = lvl1;
     g_sChar.m_cLocation.X = 4;
-    g_sChar.m_cLocation.Y = 4;
+    g_sChar.m_cLocation.Y = 1;
     /*
     if (Map2 == true)
     {
@@ -60,10 +61,6 @@ void init( void )
     // remember to set your keyboard handler, so that your functions can be notified of input events
     g_Console.setKeyboardHandler(keyboardHandler);
     g_Console.setMouseHandler(mouseHandler);
-
-    
-
- 
 }
 
 //--------------------------------------------------------------
@@ -302,7 +299,11 @@ void moveCharacter()
     {
         g_sChar.m_bActive = !g_sChar.m_bActive;        
     }
-    
+    if (Map1 && StateOfMap == lvl1)
+    {
+        if (g_sChar.m_cLocation.X > 31 && g_sChar.m_cLocation.Y >= 29)
+            StateOfMap = lvl1Part2;
+    }
 }
 void processUserInput()
 {
@@ -334,6 +335,7 @@ void render()
         break;
     case S_GAME: renderGame();
         break;
+    case S_GAME2:
     }
     renderFramerate();      // renders debug information, frame rate, elapsed time, etc
     renderInputEvents();    // renders status of input events
@@ -433,7 +435,7 @@ void renderGame()
     }
         renderMap();        // renders the map to the buffer first
         renderCharacter();  // renders the character into the buffer
-        renderDoor(21, 20);  //renders door to go to the next level
+        renderDoor(33, 20);  //renders door to go to the next level
     
 }
 
@@ -486,6 +488,59 @@ void loadlvl1()
         
     }
     lvl1TXTclear();
+}
+
+void loadlvl1Part2()
+{
+    clearScreen();
+    g_sChar.m_cLocation.X = 34;
+    g_sChar.m_cLocation.Y = 0;
+    std::fstream inFile;
+    inFile.open("lvl1part2.txt");
+
+
+    //Error check
+    if (inFile.fail())
+    {
+        std::cerr << "Error";
+        exit(1);
+    }
+
+    std::string elem;
+    // Init and store Map
+    int x = 0;
+    while (getline(inFile, elem)) //get file by string
+    {
+        for (unsigned i = 0; i < elem.length(); ++i)
+        {
+            map[x][i] = elem.at(i); //read each string character
+
+            if (map[x][i] == '.')
+            {
+                g_Console.writeToBuffer(i, x, ' ', BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE | FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+            }
+            else if (map[x][i] == '#')
+            {
+                g_Console.writeToBuffer(i, x, '#', 0 | 0);
+            }
+            else if (map[x][i] == '?')
+            {
+                g_Console.writeToBuffer(i, x, '?', 0 | 0);
+            }
+            else if (map[x][i] == '!')
+            {
+                g_Console.writeToBuffer(i, x, '!', FOREGROUND_RED | BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE);
+            }
+            else if (map[x][i] == '+')
+            {
+                g_Console.writeToBuffer(i, x, '+', FOREGROUND_GREEN | BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE);
+            }
+        }
+        x++;
+
+
+
+    }
 }
 void lvl1TXT()
 {
@@ -604,11 +659,6 @@ void triggerGameOver()
         selectQuit();
 }
 
-void selectRetry()
-{
-
-}
-
 void selectQuit()
 {
     COORD c;
@@ -691,14 +741,14 @@ void loadlvl2()
 
 void renderMap()
 {
-    
-    if (Map1)
+    switch (StateOfMap)
     {
-        loadlvl1();
-    }
-    if (Map2)
-    {
-        loadlvl2();
+    case lvl1: loadlvl1();
+        break;
+    case lvl1Part2: loadlvl1Part2();
+        break;
+    case lvl2: loadlvl2();
+        break;
     }
 }
             

@@ -49,6 +49,7 @@
     <None Include="lvl1">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="lvl1" />
   </ItemGroup>
   <ItemGroup>
     <None Include="lvl1">
@@ -60,6 +61,9 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="titlescreen.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="lvl1part2.txt">
       <Filter>Resource Files</Filter>
     </Text>
   </ItemGroup>
