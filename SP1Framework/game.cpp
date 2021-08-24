@@ -24,7 +24,7 @@ EGAMESTATES g_eGameState = S_SPLASHSCREEN; // initial state
 Console g_Console(125, 100, "SP1 Framework");
 bool retrySelected = true;
 bool quitSelected = false;
-Console g_Console(200, 200, "SP1 Framework");
+
 
 char map[300][300];
 
