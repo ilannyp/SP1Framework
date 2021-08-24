@@ -25,6 +25,7 @@ Console g_Console(125, 100, "SP1 Framework");
 bool retrySelected = true;
 bool quitSelected = false;
 
+
 char map[300][300];
 
 
