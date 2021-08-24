@@ -5,6 +5,7 @@
 
 CStopWatch g_Timer;                            // Timer function to keep track of time and the frame rate
 bool g_bQuitGame = false;                    // Set to true if you want to quit the game
+bool story = true;
 bool Map1 = true;
 bool Map2 = false;
 bool alive = true;

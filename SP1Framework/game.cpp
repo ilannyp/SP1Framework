@@ -3,6 +3,7 @@
 //
 #include "game.h"
 #include "Framework\console.h"
+#include "Framework\timer.h"
 #include <iostream>
 #include <iomanip>
 #include <sstream>
@@ -23,7 +24,10 @@ EGAMESTATES g_eGameState = S_SPLASHSCREEN; // initial state
 Console g_Console(125, 100, "SP1 Framework");
 bool retrySelected = true;
 bool quitSelected = false;
+Console g_Console(200, 200, "SP1 Framework");
+
 char map[300][300];
+
 
 //--------------------------------------------------------------
 // Purpose  : Initialisation function
@@ -56,6 +60,8 @@ void init( void )
     // remember to set your keyboard handler, so that your functions can be notified of input events
     g_Console.setKeyboardHandler(keyboardHandler);
     g_Console.setMouseHandler(mouseHandler);
+
+    
 
  
 }
@@ -309,6 +315,7 @@ void processUserInput()
     }
     */
     // quits the game if player hits the escape key
+
     if (g_skKeyEvent[K_ESCAPE].keyReleased)
         g_bQuitGame = true;    
 }
@@ -335,6 +342,7 @@ void render()
     renderInputEvents();    // renders status of input events
     renderToScreen();       // dump the contents of the buffer to the screen, one frame worth of game
 
+    
 }
 
 void clearScreen()
@@ -446,18 +454,6 @@ void loadlvl1()
 
     std::string elem;
     // Init and store Map
-    COORD c;
-  /*c.Y = 22;
-    c.X = 7;
-    g_Console.writeToBuffer(c, "You find an entrance to a hidden cave-like structure and enter", 0x03);
-    c.X = nx;
-    c.Y = ny;
-    g_Console.writeToBuffer(c, "Player: This place looks promising", 0x03);
-    c.X = nx;
-    c.Y = ny+1;
-    g_Console.writeToBuffer(c, "The treasure is close now you can feel it", 0x03);*/
-
-
     int x = 0;
     while (getline(inFile, elem)) //get file by string
     {
@@ -487,7 +483,57 @@ void loadlvl1()
             }
         }
         x++;
+        
+        
+        
     }
+    lvl1TXTclear();
+}
+void lvl1TXT()
+{
+    COORD c = g_Console.getConsoleSize();
+    std::string s1{ "You find an entrance to a hidden cave-like structure and enter" };
+    std::string s2{ "Player: This place looks promising" };
+    std::string s3{ "The treasure is close now you can feel it" };
+    if (g_skKeyEvent[K_SPACE].keyReleased)
+    {
+        story = false;
+        lvl1TXTclear();
+    }
+    else
+    {
+        c.Y = 22;
+        c.X = 7;
+        g_Console.writeToBuffer(c, s1, 0x03);
+        c.X = 7;
+        c.Y = 24;
+        g_Console.writeToBuffer(c, s2, 0x03);
+        c.X = 7;
+        c.Y = 25;
+        g_Console.writeToBuffer(c, s3, 0x03);
+    }
+ 
+}
+void lvl1TXTclear()
+{
+    COORD c = g_Console.getConsoleSize();
+    if (story)
+    {
+        lvl1TXT();
+    }
+    else
+    {
+        c.Y = 22;
+        c.X = 7;
+        g_Console.writeToBuffer(c, "", 0x03);
+        c.X = 7;
+        c.Y = 24;
+        g_Console.writeToBuffer(c, "", 0x03);
+        c.X = 7;
+        c.Y = 25;
+        g_Console.writeToBuffer(c, "", 0x03);
+    }
+    
 }
     /*for (int x = 0; x <300; x++)
     {
@@ -641,6 +687,9 @@ void loadlvl2()
     c.Y = ny;
     g_Console.writeToBuffer(c, "As you enter the second level a strange feeling passes over you almost as if someone is watching you.", 0x03); */
 }
+
+
+
 
 void renderMap()
 {

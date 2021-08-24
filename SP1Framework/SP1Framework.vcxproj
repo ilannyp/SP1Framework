@@ -90,6 +90,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="lvl1" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="lvl1" />
     <None Include="lvl2" />
   </ItemGroup>
   <ItemGroup>
