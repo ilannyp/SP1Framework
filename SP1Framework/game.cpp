@@ -24,7 +24,6 @@ EGAMESTATES g_eGameState = S_SPLASHSCREEN; // initial state
 Console g_Console(125, 100, "SP1 Framework");
 bool retrySelected = true;
 bool quitSelected = false;
-Console g_Console(200, 200, "SP1 Framework");
 
 char map[300][300];
 
@@ -302,10 +301,7 @@ void moveCharacter()
     {
         g_sChar.m_bActive = !g_sChar.m_bActive;        
     }
-    if (map[g_sChar.m_cLocation.Y][g_sChar.m_cLocation.X] == '!')
-    {
-        alive = false;
-    }
+    
 }
 void processUserInput()
 {
@@ -429,14 +425,15 @@ void renderSplashScreen()  // renders the splash screen
 
 void renderGame()
 {
-    
-    if (alive)
+    if (map[g_sChar.m_cLocation.Y][g_sChar.m_cLocation.X] == '!')
     {
+        alive = false;
+        triggerGameOver();
+    }
         renderMap();        // renders the map to the buffer first
         renderCharacter();  // renders the character into the buffer
         renderDoor(21, 20);  //renders door to go to the next level
-    }
-    triggerGameOver();
+    
 }
 
 void loadlvl1()
