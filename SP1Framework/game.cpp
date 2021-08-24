@@ -295,11 +295,6 @@ void moveCharacter()
     {
         g_sChar.m_bActive = !g_sChar.m_bActive;        
     }
-    if (g_sChar.m_cLocation.X == '!' && g_sChar.m_cLocation.Y == '!')
-    {
-        gameOver();
-    }
-   
 }
 void processUserInput()
 {
@@ -421,10 +416,14 @@ void renderSplashScreen()  // renders the splash screen
 
 void renderGame()
 {
+    
     renderMap();        // renders the map to the buffer first
     renderCharacter();  // renders the character into the buffer
     renderDoor(21,20);  //renders door to go to the next level
-    
+    if (map[g_sChar.m_cLocation.Y][g_sChar.m_cLocation.X] == '!')
+    {
+        triggerGameOver();
+    }
 }
 
 void loadlvl1()
@@ -507,11 +506,10 @@ void loadlvl1()
 
 void gameOver()
 {
-    clearScreen();
+    
     COORD c;
     COORD retry;
     COORD quit;
-
     bool again = true;
     c.X = 33;
     c.Y = 8;
@@ -522,7 +520,6 @@ void gameOver()
     quit.X = 35;
     quit.Y = 15;
     g_Console.writeToBuffer(quit, "Quit");
-
     if (g_skKeyEvent[K_UP].keyReleased)
     {
         again = true;
@@ -534,21 +531,31 @@ void gameOver()
     if (again = true)
     {
         g_Console.writeToBuffer(retry, "Retry", BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE);
-        if (g_skKeyEvent[K_ENTER].keyDown)
+        if (g_skKeyEvent[K_ENTER].keyReleased)
         {
-            renderGame();
+            Map1 = true;
+            init();
+            g_eGameState = S_GAME;
         }
     }
-    else
+    if (!again)
     {
         g_Console.writeToBuffer(quit, "Quit", BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE);
         {
-            if (g_skKeyEvent[K_ENTER].keyDown)
+            if (g_skKeyEvent[K_ENTER].keyReleased)
             {
-                shutdown();
+                g_bQuitGame = true;
             }
         }
-    }
+    } 
+}
+
+void triggerGameOver()
+{
+   
+    Map1 = false;
+    clearScreen();
+    gameOver();
 }
 
 void loadlvl2()
@@ -606,11 +613,12 @@ void loadlvl2()
 
 void renderMap()
 {
-    if (!Map2)
+    
+    if (Map1)
     {
         loadlvl1();
     }
-    else if (Map2)
+    if (Map2)
     {
         loadlvl2();
     }

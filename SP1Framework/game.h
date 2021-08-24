@@ -5,6 +5,7 @@
 
 extern CStopWatch g_swTimer;
 extern bool g_bQuitGame;
+extern bool Map1;
 extern bool Map2;
 
 // struct to store keyboard events
@@ -42,6 +43,7 @@ enum EGAMESTATES
 {
     S_SPLASHSCREEN,
     S_GAME,
+    S_GAMEOVER,
     S_COUNT
 };
 
@@ -82,8 +84,8 @@ void mouseHandler(const MOUSE_EVENT_RECORD& mouseEvent);      // define this fun
 void gameplayKBHandler(const KEY_EVENT_RECORD& keyboardEvent);   // handles keyboard events for gameplay 
 void gameplayMouseHandler(const MOUSE_EVENT_RECORD& mouseEvent); // handles mouse events for gameplay 
 
-void renderEndDoor();
 void loadlvl1();
 void loadlvl2();
 void gameOver();
+void triggerGameOver();
 #endif // _GAME_H
