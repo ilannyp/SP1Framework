@@ -1,11 +1,17 @@
 #ifndef _GAME_H
 #define _GAME_H
-
+#include <string>
+using namespace std;
+#include "gameItem.h"
 #include "Framework\timer.h"
 
 extern CStopWatch g_swTimer;
 extern bool g_bQuitGame;
+extern bool story;
+extern bool Map1;
 extern bool Map2;
+extern bool alive;
+
 
 // struct to store keyboard events
 // a small subset of KEY_EVENT_RECORD
@@ -42,7 +48,7 @@ enum EGAMESTATES
 {
     S_SPLASHSCREEN,
     S_GAME,
-    S_Map2,
+    S_GAMEOVER,
     S_COUNT
 };
 
@@ -56,7 +62,11 @@ struct SGameDoor
 {
     COORD m_dLocation;
 };
+<<<<<<< HEAD
 
+
+=======
+>>>>>>> 53777cfccc07e16c04a952134b36728822f68857
 void init        ( void );      // initialize your variables, allocate memory, etc
 void getInput    ( void );      // get input from player
 void update      ( double dt ); // update the game and the state of the game
@@ -75,6 +85,8 @@ void renderCharacter();     // renders the character into the buffer
 void renderFramerate();     // renders debug information, frame rate, elapsed time, etc
 void renderToScreen();      // dump the contents of the buffer to the screen, one frame worth of game
 void renderInputEvents();   // renders the status of input events
+void renderItem(); // render gameItems
+
 
 // keyboard and mouse input event managers
 void keyboardHandler(const KEY_EVENT_RECORD& keyboardEvent);  // define this function for the console to call when there are keyboard events
@@ -83,8 +95,17 @@ void mouseHandler(const MOUSE_EVENT_RECORD& mouseEvent);      // define this fun
 void gameplayKBHandler(const KEY_EVENT_RECORD& keyboardEvent);   // handles keyboard events for gameplay 
 void gameplayMouseHandler(const MOUSE_EVENT_RECORD& mouseEvent); // handles mouse events for gameplay 
 
-void renderEndDoor();
+<<<<<<< HEAD
+void renderDoor(int x, int y);
+=======
+>>>>>>> 53777cfccc07e16c04a952134b36728822f68857
 void loadlvl1();
-void walls(int x, int y);
+void lvl1TXT();
+void lvl1TXTclear();
 void loadlvl2();
+
+void gameOver();
+void triggerGameOver();
+void selectRetry();
+void selectQuit();
 #endif // _GAME_H

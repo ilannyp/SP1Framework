@@ -3,26 +3,42 @@
 //
 #include "game.h"
 #include "Framework\console.h"
+<<<<<<< HEAD
+#include "Enemy.h"
+#include "Player.h"
+#include "Entity.h"
+=======
+#include "Framework\timer.h"
+>>>>>>> 53777cfccc07e16c04a952134b36728822f68857
 #include <iostream>
 #include <iomanip>
 #include <sstream>
 #include <fstream>
 #include <string>
+#include <stdlib.h>
+#include "gameItem.h"
 
 double  g_dElapsedTime;
 double  g_dDeltaTime;
+int instance;
 SKeyEvent g_skKeyEvent[K_COUNT];
 SMouseEvent g_mouseEvent;
 
 // Game specific variables here
 SGameChar   g_sChar;
 SGameDoor   g_dDoor;
-EGAMESTATES g_eGameState = S_SPLASHSCREEN; // initial state
 
+EGAMESTATES g_eGameState = S_SPLASHSCREEN; // initial state
+Entity* CEntities[6];
+gameItem * NoOfItems[5];
 // Console object
-Console g_Console(80, 25, "SP1 Framework");
+Console g_Console(125, 100, "SP1 Framework");
+bool retrySelected = true;
+bool quitSelected = false;
+
 
 char map[300][300];
+
 
 //--------------------------------------------------------------
 // Purpose  : Initialisation function
@@ -33,14 +49,26 @@ char map[300][300];
 //--------------------------------------------------------------
 void init( void )
 {
+    instance = 0;
+    CEntities[0] = new Player("NoobMaster69", 100, 15, 10, true, true, true);
+    CEntities[1] = new Enemy("Sea Crab", 47, 10, 10, true);
+    CEntities[2] = new Enemy("Baby Shark", 21, 20, 10, true);
+    CEntities[3] = new Enemy("Wizard Frog", 70, 32, 10, true);
+    CEntities[4] = new Enemy("Dragon", 65, 40, 10, true);
+    CEntities[5] = new Enemy("Alien", 100, 35, 10, true);
+
+    NoOfItems[0] = new gameItem("Trident", 4, 0, 0, 36, 18, true);
+    NoOfItems[1] = new gameItem("Jordans", 0, 4, 0, 24, 6, true);
+    NoOfItems[2] = new gameItem("HP up", 0, 0, 20, 21, 9, true);
+
     // Set precision for floating point output
     g_dElapsedTime = 0.0;    
 
     // sets the initial state for the game
     g_eGameState = S_SPLASHSCREEN;
 
-    g_sChar.m_cLocation.X = g_Console.getConsoleSize().X / 2;
-    g_sChar.m_cLocation.Y = g_Console.getConsoleSize().Y / 2;
+    g_sChar.m_cLocation.X = 4;
+    g_sChar.m_cLocation.Y = 4;
     /*
     if (Map2 == true)
     {
@@ -55,6 +83,9 @@ void init( void )
     // remember to set your keyboard handler, so that your functions can be notified of input events
     g_Console.setKeyboardHandler(keyboardHandler);
     g_Console.setMouseHandler(mouseHandler);
+    
+
+    
 
  
 }
@@ -201,13 +232,40 @@ void gameplayMouseHandler(const MOUSE_EVENT_RECORD& mouseEvent)
     g_mouseEvent.buttonState = mouseEvent.dwButtonState;
     g_mouseEvent.eventFlags = mouseEvent.dwEventFlags;
 }
-void renderDoor(double x, double y)
+void renderDoor(int x, int y)
 {
     WORD doorColor = 0x0F;
     g_Console.writeToBuffer(g_dDoor.m_dLocation,(char)48, doorColor);
     g_dDoor.m_dLocation.X = x;
     g_dDoor.m_dLocation.Y = y;
 
+}
+void renderItem()
+{
+    WORD itemColor = 0x2B;
+    srand(time(NULL));
+    int itemGen = rand() % 3 + 1;
+
+
+   
+    if (itemGen == 1)
+    {
+        instance = 1;
+       g_Console.writeToBuffer(NoOfItems[0]->getX(), NoOfItems[0]->getY(), (char)48, itemColor);
+    }
+    else if (itemGen == 2)
+    {
+        instance = 2;
+        g_Console.writeToBuffer(NoOfItems[1]->getX(), NoOfItems[1]->getY(), (char)47, itemColor);
+    }
+    else if (itemGen == 3)
+    {
+        instance = 3;
+        g_Console.writeToBuffer(NoOfItems[2]->getX(), NoOfItems[2]->getY(), (char)46, itemColor);
+    }
+  
+    
+    
 }
 
 
@@ -258,15 +316,11 @@ void updateGame()       // gameplay logic
 {
     processUserInput(); // checks if you should change states or do something else with the game, e.g. pause, exit
     moveCharacter();    // moves the character, collision detection, physics, etc
-                        // sound can be played here too.
+    
 }
 
 void moveCharacter()
 {    
-    // Updating the location of the character based on the key release
-
-    
-    
     if (g_skKeyEvent[K_UP].keyDown && g_sChar.m_cLocation.Y > 0)
     {
         if (map[g_sChar.m_cLocation.Y - 1][g_sChar.m_cLocation.X] != '#')
@@ -299,8 +353,7 @@ void moveCharacter()
     {
         g_sChar.m_bActive = !g_sChar.m_bActive;        
     }
-
-   
+    
 }
 void processUserInput()
 {
@@ -310,6 +363,7 @@ void processUserInput()
     }
     */
     // quits the game if player hits the escape key
+
     if (g_skKeyEvent[K_ESCAPE].keyReleased)
         g_bQuitGame = true;    
 }
@@ -335,6 +389,8 @@ void render()
     renderFramerate();      // renders debug information, frame rate, elapsed time, etc
     renderInputEvents();    // renders status of input events
     renderToScreen();       // dump the contents of the buffer to the screen, one frame worth of game
+
+    
 }
 
 void clearScreen()
@@ -376,33 +432,33 @@ void renderSplashScreen()  // renders the splash screen
         {
             if (title[y][x] == '|')
             {
-                g_Console.writeToBuffer(x, y, '|');
+                g_Console.writeToBuffer(x, y, '|',BACKGROUND_BLUE | FOREGROUND_RED);
             }
             if (title[y][x] == '_')
             {
-                g_Console.writeToBuffer(x, y, '_');
+                g_Console.writeToBuffer(x, y, '_', BACKGROUND_BLUE | FOREGROUND_RED);
             }
             if (title[y][x] == '/')
             {
-                g_Console.writeToBuffer(x, y, '/');
+                g_Console.writeToBuffer(x, y, '/', BACKGROUND_BLUE | FOREGROUND_RED);
             }
             if (title[y][x] == '.')
             {
-                g_Console.writeToBuffer(x, y, '.');
+                g_Console.writeToBuffer(x, y, '.', BACKGROUND_BLUE | FOREGROUND_RED);
             }
             if (title[y][x] == '>')
             {
-                g_Console.writeToBuffer(x, y, '>');
+                g_Console.writeToBuffer(x, y, '>', BACKGROUND_BLUE | FOREGROUND_RED);
             }
             if (title[y][x] == '(')
             {
-                g_Console.writeToBuffer(x, y, '(');
+                g_Console.writeToBuffer(x, y, '(', BACKGROUND_BLUE | FOREGROUND_RED);
             }
         }
     }
     COORD c = g_Console.getConsoleSize();
-    c.Y /= 3;
-    c.X = c.X / 2 - 5;
+    c.Y = 10;
+    c.X = 35;
     g_Console.writeToBuffer(c, "Start", 0x03);
 
     c.Y = 18;
@@ -421,9 +477,34 @@ void renderSplashScreen()  // renders the splash screen
 
 void renderGame()
 {
-    renderMap();        // renders the map to the buffer first
-    renderCharacter();  // renders the character into the buffer
-    renderDoor(21,20);  //renders door to go to the next level
+<<<<<<< HEAD
+    if (NoOfItems[0]->getActivity() == true ||
+        NoOfItems[1]->getActivity() == true ||
+        NoOfItems[2]->getActivity() == true) 
+    {
+        renderMap();        // renders the map to the buffer first
+        renderCharacter();  // renders the character into the buffer
+        renderDoor(35, 22);  //renders door to go to the next level
+        renderItem();
+    }
+    else 
+    {
+        renderMap();
+        renderCharacter();
+        renderDoor(35, 22);
+
+    }
+    
+
+    if (map[g_sChar.m_cLocation.Y][g_sChar.m_cLocation.X] == '!')
+    {
+        alive = false;
+        triggerGameOver();
+    }
+        renderMap();        // renders the map to the buffer first
+        renderCharacter();  // renders the character into the buffer
+        renderDoor(21, 20);  //renders door to go to the next level
+
     
 }
 
@@ -442,18 +523,201 @@ void loadlvl1()
 
     std::string elem;
     // Init and store Map
+    int x = 0;
+    while (getline(inFile, elem)) //get file by string
+    {
+        for (unsigned i = 0; i < elem.length(); ++i)
+        {
+            map[x][i] = elem.at(i); //read each string character
+
+            if (map[x][i] == '.')
+            {
+                g_Console.writeToBuffer(i, x, ' ', BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE | FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+            }
+            else if (map[x][i] == '#')
+            {
+                g_Console.writeToBuffer(i, x, '#', 0 | 0);
+            }
+            else if (map[x][i] == '?')
+            {
+                g_Console.writeToBuffer(i, x, '?', 0 | 0);
+            }
+            else if (map[x][i] == '!')
+            {
+                g_Console.writeToBuffer(i, x, '!', FOREGROUND_RED | BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE);
+            }
+            else if (map[x][i] == '+')
+            {
+                g_Console.writeToBuffer(i, x, '+', FOREGROUND_GREEN | BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE);
+            }
+        }
+        x++;
+        
+        
+        
+    }
+    lvl1TXTclear();
+}
+void lvl1TXT()
+{
     COORD c = g_Console.getConsoleSize();
-  /*c.Y = 22;
-    c.X = 7;
-    g_Console.writeToBuffer(c, "You find an entrance to a hidden cave-like structure and enter", 0x03);
-    c.X = nx;
-    c.Y = ny;
-    g_Console.writeToBuffer(c, "Player: This place looks promising", 0x03);
-    c.X = nx;
-    c.Y = ny+1;
-    g_Console.writeToBuffer(c, "The treasure is close now you can feel it", 0x03);*/
+    std::string s1{ "You find an entrance to a hidden cave-like structure and enter" };
+    std::string s2{ "Player: This place looks promising" };
+    std::string s3{ "The treasure is close now you can feel it" };
+    if (g_skKeyEvent[K_SPACE].keyReleased)
+    {
+        story = false;
+        lvl1TXTclear();
+    }
+    else
+    {
+        c.Y = 22;
+        c.X = 7;
+        g_Console.writeToBuffer(c, s1, 0x03);
+        c.X = 7;
+        c.Y = 24;
+        g_Console.writeToBuffer(c, s2, 0x03);
+        c.X = 7;
+        c.Y = 25;
+        g_Console.writeToBuffer(c, s3, 0x03);
+    }
+ 
+}
+void lvl1TXTclear()
+{
+    COORD c = g_Console.getConsoleSize();
+    if (story)
+    {
+        lvl1TXT();
+    }
+    else
+    {
+        c.Y = 22;
+        c.X = 7;
+        g_Console.writeToBuffer(c, "", 0x03);
+        c.X = 7;
+        c.Y = 24;
+        g_Console.writeToBuffer(c, "", 0x03);
+        c.X = 7;
+        c.Y = 25;
+        g_Console.writeToBuffer(c, "", 0x03);
+    }
+    
+}
+    /*for (int x = 0; x <300; x++)
+    {
+        for (int y = 0; y < 300; y++)
+        {
+            if (map[x][y] == '.')
+            {
+                g_Console.writeToBuffer(y, x, ' ', BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE | FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+            }
+            else if (map[x][y] == '#')
+            {
+                g_Console.writeToBuffer(y, x , '#', 0 | 0);
+            }
+            else if (map[x][y] == '?')
+            {
+                g_Console.writeToBuffer(y, x, '?', 0 | 0);
+            }
+            else if (map[x][y] == '!')
+            {
+                g_Console.writeToBuffer(y, x, '!', FOREGROUND_RED | BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE);
+            }
+            else if (map[x][y] == '+')
+            {
+                g_Console.writeToBuffer(y, x, '+', FOREGROUND_GREEN | BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE);
+            }
+        }
+    }
+}*/
 
+void gameOver()
+{
+    retrySelected = true;
+    COORD c;
+    COORD retry;
+    COORD quit;
+    c.X = 33;
+    c.Y = 8;
+    g_Console.writeToBuffer(c, "Game Over");
+    retry.X = 35;
+    retry.Y = 12;
+    g_Console.writeToBuffer(retry, "Retry");
+    quit.X = 35;
+    quit.Y = 15;
+    g_Console.writeToBuffer(quit, "Quit");
+    g_Console.writeToBuffer(retry, "Retry", BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE);
+    if (g_skKeyEvent[K_ENTER].keyReleased)
+    {
+        Map1 = true;
+        alive = true;
+        init();
+        g_eGameState = S_GAME;
+    }
+    
+    if (g_skKeyEvent[K_DOWN].keyReleased)
+    {
+        quitSelected = true;
+        retrySelected = false;
+        selectQuit();
+    }
+}
 
+void triggerGameOver()
+{
+    alive = false;
+    Map1 = false;
+    clearScreen();
+    if (retrySelected)
+        gameOver();
+    if (quitSelected)
+        selectQuit();
+}
+
+void selectRetry()
+{
+
+}
+
+void selectQuit()
+{
+    COORD c;
+    COORD retry;
+    COORD quit;
+    c.X = 33;
+    c.Y = 8;
+    g_Console.writeToBuffer(c, "Game Over");
+    retry.X = 35;
+    retry.Y = 12;
+    g_Console.writeToBuffer(retry, "Retry");
+    quit.X = 35;
+    quit.Y = 15;
+    g_Console.writeToBuffer(quit, "Quit", BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE);
+    if (g_skKeyEvent[K_ENTER].keyReleased)
+    {
+        g_bQuitGame = true;
+    }
+    if (g_skKeyEvent[K_UP].keyReleased)
+    {
+        retrySelected = true;
+        quitSelected = false;
+    }
+}
+
+void loadlvl2()
+{
+    std::fstream inFile;
+    inFile.open("lvl2");
+
+    //Error check
+    if (inFile.fail())
+    {
+        std::cerr << "Error";
+        exit(1);
+    }
+
+    std::string elem;
     int x = 0;
     while (getline(inFile, elem)) //get file by string
     {
@@ -484,109 +748,26 @@ void loadlvl1()
         }
         x++;
     }
-}
-    /*for (int x = 0; x <300; x++)
-    {
-        for (int y = 0; y < 300; y++)
-        {
-            if (map[x][y] == '.')
-            {
-                g_Console.writeToBuffer(y, x, ' ', BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE | FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
-            }
-            else if (map[x][y] == '#')
-            {
-                g_Console.writeToBuffer(y, x , '#', 0 | 0);
-            }
-            else if (map[x][y] == '?')
-            {
-                g_Console.writeToBuffer(y, x, '?', 0 | 0);
-            }
-            else if (map[x][y] == '!')
-            {
-                g_Console.writeToBuffer(y, x, '!', FOREGROUND_RED | BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE);
-            }
-            else if (map[x][y] == '+')
-            {
-                g_Console.writeToBuffer(y, x, '+', FOREGROUND_GREEN | BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE);
-            }
-        }
-    }
-}*/
-
-void walls(int x, int y)
-{
-    
-    
-    
-}
-
-void loadlvl2()
-{
-    std::fstream inFile;
-    inFile.open("lvl2");
-
-    //Error check
-    if (inFile.fail())
-    {
-        std::cerr << "Error";
-        exit(1);
-    }
-
-    std::string elem;
-    // Init and store Map
-    int x = 0;
-    while (getline(inFile, elem)) //get file by string
-    {
-        for (unsigned i = 0; i < elem.length(); ++i)
-        {
-            map[x][i] = elem.at(i); //read each string character
-
-        }
-        x++;
-
-    }
     COORD c = g_Console.getConsoleSize();
    /* c.Y = nx;
     c.X = ny;
     g_Console.writeToBuffer(c, "Player:I just wanted some treasure man..", 0x03);
     c.X = nx;
     c.Y = ny;
-    g_Console.writeToBuffer(c, "As you enter the second level a strange feeling passes over you almost as if someone is watching you.", 0x03);
-    for (int x = 0; x < 300; x++)*/
-    {
-        for (int y = 0; y < 300; y++)
-        {
-            if (map[x][y] == '.')
-            {
-                g_Console.writeToBuffer(y, x, ' ', BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE | FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
-            }
-            else if (map[x][y] == '#')
-            {
-                g_Console.writeToBuffer(y, x, '#', 0 | 0);
-            }
-            else if (map[x][y] == '?')
-            {
-                g_Console.writeToBuffer(y, x, '?', 0 | 0);
-            }
-            else if (map[x][y] == '!')
-            {
-                g_Console.writeToBuffer(y, x, '!', FOREGROUND_RED | BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE);
-            }
-            else if (map[x][y] == '+')
-            {
-                g_Console.writeToBuffer(y, x, '+', FOREGROUND_GREEN | BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE);
-            }
-        }
-    }
+    g_Console.writeToBuffer(c, "As you enter the second level a strange feeling passes over you almost as if someone is watching you.", 0x03); */
 }
+
+
+
 
 void renderMap()
 {
-    if (!Map2)
+    
+    if (Map1)
     {
         loadlvl1();
     }
-    else if (Map2)
+    if (Map2)
     {
         loadlvl2();
     }
@@ -609,7 +790,7 @@ void renderCharacter()
         g_sChar.m_cLocation.Y = g_Console.getConsoleSize().Y / 2;
     }
     */
-    g_Console.writeToBuffer(g_sChar.m_cLocation, (char)1, charColor); 
+    g_Console.writeToBuffer(g_sChar.m_cLocation, (char)1, charColor ); 
 }
 
 void renderFramerate()
@@ -647,12 +828,37 @@ void renderInputEvents()
       {
               if (g_skKeyEvent[K_SPACE].keyReleased)
               {
-                  clearScreen(); 
-                  loadlvl2();
+                  clearScreen();
+                  Map1 = false;
+                  Map2 = true;
+                  
               }
             
 
       }
+    if ((g_sChar.m_cLocation.X ==  NoOfItems[0]->getX() && g_sChar.m_cLocation.Y == NoOfItems[0]->getY()) ||
+        (g_sChar.m_cLocation.X == NoOfItems[1]->getX() && g_sChar.m_cLocation.Y == NoOfItems[1]->getY())||
+        (g_sChar.m_cLocation.X == NoOfItems[2]->getX() && g_sChar.m_cLocation.Y == NoOfItems[2]->getY()))
+    {
+        //if (g_skKeyEvent[K_SPACE].keyReleased)
+        //{
+            switch (instance) {
+            case 1:
+                NoOfItems[0]->~gameItem();
+                delete NoOfItems[0];
+                NoOfItems[0]->setActivity(false);
+            case 2:
+                NoOfItems[1]->~gameItem();
+                delete NoOfItems[1];
+                NoOfItems[1]->setActivity(false);
+            case 3:
+                NoOfItems[2]->~gameItem();
+                delete NoOfItems[2];
+                NoOfItems[2]->setActivity(false);
+            }
+           
+       // }
+    }
     
 }
 
