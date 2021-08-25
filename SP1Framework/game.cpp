@@ -35,6 +35,8 @@ gameItem * NoOfItems[5];
 Console g_Console(125, 100, "SP1 Framework");
 bool retrySelected = true;
 bool quitSelected = false;
+bool part1;
+bool part2;
 
 
 char map[300][300];
@@ -67,15 +69,11 @@ void init( void )
     // sets the initial state for the game
     g_eGameState = S_SPLASHSCREEN;
 
+    part1 = true; //init map parts
+    part2 = false;
     g_sChar.m_cLocation.X = 4;
-    g_sChar.m_cLocation.Y = 4;
-    /*
-    if (Map2 == true)
-    {
-        g_sChar.m_cLocation.X = 0;
-        g_sChar.m_cLocation.Y = g_Console.getConsoleSize().Y / 2;
-    }
-    */
+    g_sChar.m_cLocation.Y = 1;
+    
     g_sChar.m_bActive = true;
     // sets the width, height and the font name to use in the console
     g_Console.setConsoleFont(0, 16, L"Consolas");
@@ -268,14 +266,6 @@ void renderItem()
     
 }
 
-
-
-/*void renderMap2()
-{
-
-}
-*/
-
 //--------------------------------------------------------------
 // Purpose  : Update function
 //            This is the update function
@@ -316,7 +306,62 @@ void updateGame()       // gameplay logic
 {
     processUserInput(); // checks if you should change states or do something else with the game, e.g. pause, exit
     moveCharacter();    // moves the character, collision detection, physics, etc
-    
+    if (StateOfMap == lvl1)
+    {
+        if (part1)
+        {
+            if (g_skKeyEvent[K_DOWN].keyDown && g_sChar.m_cLocation.Y == 28)
+            {
+                clearScreen();
+                g_sChar.m_cLocation.Y = 0;
+                part1 = false;
+            }
+        }
+        else
+        {
+            if (g_skKeyEvent[K_UP].keyDown &&  g_sChar.m_cLocation.Y == 0)
+            {
+                clearScreen();
+                g_sChar.m_cLocation.Y = 27;
+                part1 = true;
+            }
+        }
+    }
+    if (g_sChar.m_cLocation.X == g_dDoor.m_dLocation.X && g_sChar.m_cLocation.Y == g_dDoor.m_dLocation.Y)
+    {
+        if (g_skKeyEvent[K_SPACE].keyReleased)
+        {
+            clearScreen();
+            StateOfMap = lvl2;
+            g_sChar.m_cLocation.X = 16;
+            g_sChar.m_cLocation.Y = 20;
+            part1 = true;
+
+        }
+    }
+    if (StateOfMap == lvl2)
+    {
+        if (part1)
+        {
+            if (g_skKeyEvent[K_DOWN].keyDown && g_sChar.m_cLocation.Y == 28)
+            {
+                clearScreen();
+                g_sChar.m_cLocation.Y = 0;
+                part1 = false;
+                part2 = true;
+            }
+        }
+        else if (part2)
+        {
+            if (g_skKeyEvent[K_DOWN].keyDown && g_sChar.m_cLocation.Y == 0)
+            {
+                clearScreen();
+                g_sChar.m_cLocation.Y = 27;
+                part1 = true;
+                part2 = false;
+            }
+        }
+    }
 }
 
 void moveCharacter()
@@ -349,19 +394,10 @@ void moveCharacter()
             g_sChar.m_cLocation.X++;
         }
     }
-    if (g_skKeyEvent[K_SPACE].keyReleased)
-    {
-        g_sChar.m_bActive = !g_sChar.m_bActive;        
-    }
     
 }
 void processUserInput()
 {
-    /*if (g_skKeyEvent[K_SPACE].keyReleased && g_sChar.m_cLocation.X == g_endDoor.location.X && g_sChar.m_cLocation.Y == g_endDoor.location.Y)
-    {
-        Map2 = true;
-    }
-    */
     // quits the game if player hits the escape key
 
     if (g_skKeyEvent[K_ESCAPE].keyReleased)
@@ -504,16 +540,20 @@ void renderGame()
         renderMap();        // renders the map to the buffer first
         renderCharacter();  // renders the character into the buffer
         renderDoor(21, 20);  //renders door to go to the next level
-
     
 }
 
 void loadlvl1()
 {
     std::fstream inFile;
-    inFile.open("lvl1");
-
-
+    if (part1)
+    {
+        inFile.open("lvl1");
+    }
+    else
+    {
+        inFile.open("lvl1part2.txt");
+    }
     //Error check
     if (inFile.fail())
     {
@@ -552,12 +592,15 @@ void loadlvl1()
             }
         }
         x++;
-        
-        
-        
     }
-    lvl1TXTclear();
+    if (part1)
+    {
+        renderDoor(71, 5);  //renders door to go to the next level
+        lvl1TXTclear();
+    }
 }
+
+
 void lvl1TXT()
 {
     COORD c = g_Console.getConsoleSize();
@@ -650,7 +693,6 @@ void gameOver()
     g_Console.writeToBuffer(retry, "Retry", BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE);
     if (g_skKeyEvent[K_ENTER].keyReleased)
     {
-        Map1 = true;
         alive = true;
         init();
         g_eGameState = S_GAME;
@@ -667,17 +709,11 @@ void gameOver()
 void triggerGameOver()
 {
     alive = false;
-    Map1 = false;
     clearScreen();
     if (retrySelected)
         gameOver();
     if (quitSelected)
         selectQuit();
-}
-
-void selectRetry()
-{
-
 }
 
 void selectQuit()
@@ -708,7 +744,14 @@ void selectQuit()
 void loadlvl2()
 {
     std::fstream inFile;
-    inFile.open("lvl2");
+    if (part1)
+    {
+        inFile.open("lvl2");
+    }
+    if (part2)
+    {
+        inFile.open("lvl2part2.txt");
+    }
 
     //Error check
     if (inFile.fail())
@@ -762,14 +805,12 @@ void loadlvl2()
 
 void renderMap()
 {
-    
-    if (Map1)
+    switch (StateOfMap)
     {
-        loadlvl1();
-    }
-    if (Map2)
-    {
-        loadlvl2();
+    case lvl1: loadlvl1();
+        break;
+    case lvl2: loadlvl2();
+        break;
     }
 }
             
@@ -822,6 +863,9 @@ void renderInputEvents()
     ss.str("");
     ss << "Mouse position (" << g_mouseEvent.mousePosition.X << ", " << g_mouseEvent.mousePosition.Y << ")";
     g_Console.writeToBuffer(g_mouseEvent.mousePosition, ss.str(), 0x59);
+    
+    
+    
     
     
     if (g_sChar.m_cLocation.X == g_dDoor.m_dLocation.X && g_sChar.m_cLocation.Y == g_dDoor.m_dLocation.Y)

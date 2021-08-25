@@ -8,8 +8,6 @@ using namespace std;
 extern CStopWatch g_swTimer;
 extern bool g_bQuitGame;
 extern bool story;
-extern bool Map1;
-extern bool Map2;
 extern bool alive;
 
 
@@ -50,6 +48,12 @@ enum EGAMESTATES
     S_GAME,
     S_GAMEOVER,
     S_COUNT
+};
+
+enum MAPSTATE
+{
+    lvl1,
+    lvl2
 };
 
 // struct for the game character
@@ -106,6 +110,5 @@ void loadlvl2();
 
 void gameOver();
 void triggerGameOver();
-void selectRetry();
 void selectQuit();
 #endif // _GAME_H
