@@ -85,7 +85,8 @@ void init( void )
 
     
 
- 
+    g_endDoor.location.X = 12;
+    g_endDoor.location.Y = 12;
 }
 
 //--------------------------------------------------------------
@@ -230,13 +231,14 @@ void gameplayMouseHandler(const MOUSE_EVENT_RECORD& mouseEvent)
     g_mouseEvent.buttonState = mouseEvent.dwButtonState;
     g_mouseEvent.eventFlags = mouseEvent.dwEventFlags;
 }
+<<<<<<< HEAD
 void renderDoor(int x, int y)
+=======
+void renderDoor()
+>>>>>>> parent of 3cdbf05 (Merge branch 'master' of https://github.com/ilannyp/SP1Framework)
 {
     WORD doorColor = 0x0F;
     g_Console.writeToBuffer(g_dDoor.m_dLocation,(char)48, doorColor);
-    g_dDoor.m_dLocation.X = x;
-    g_dDoor.m_dLocation.Y = y;
-
 }
 void renderItem()
 {
@@ -522,6 +524,7 @@ void renderSplashScreen()  // renders the splash screen
 void renderGame()
 {
 <<<<<<< HEAD
+<<<<<<< HEAD
     if (NoOfItems[0]->getActivity() == true ||
         NoOfItems[1]->getActivity() == true ||
         NoOfItems[2]->getActivity() == true) 
@@ -548,6 +551,11 @@ void renderGame()
         renderMap();        // renders the map to the buffer first
         renderCharacter();  // renders the character into the buffer
         renderDoor(21, 20);  //renders door to go to the next level
+=======
+    renderMap();        // renders the map to the buffer first
+    renderCharacter();  // renders the character into the buffer
+    renderDoor();  //renders door to go to the next level
+>>>>>>> parent of 3cdbf05 (Merge branch 'master' of https://github.com/ilannyp/SP1Framework)
     
 }
 
@@ -880,10 +888,14 @@ void renderInputEvents()
       {
               if (g_skKeyEvent[K_SPACE].keyReleased)
               {
+<<<<<<< HEAD
                   clearScreen();
                   Map1 = false;
                   Map2 = true;
                   
+=======
+                  g_bQuitGame = true;
+>>>>>>> parent of 3cdbf05 (Merge branch 'master' of https://github.com/ilannyp/SP1Framework)
               }
             
 
