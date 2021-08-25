@@ -266,6 +266,14 @@ void renderItem()
     
 }
 
+
+
+/*void renderMap2()
+{
+
+}
+*/
+
 //--------------------------------------------------------------
 // Purpose  : Update function
 //            This is the update function
