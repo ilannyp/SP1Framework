@@ -6,8 +6,6 @@
 extern CStopWatch g_swTimer;
 extern bool g_bQuitGame;
 extern bool story;
-extern bool Map1;
-extern bool Map2;
 extern bool alive;
 
 
@@ -46,14 +44,13 @@ enum EGAMESTATES
 {
     S_SPLASHSCREEN,
     S_GAME,
-    S_GAME2,
+    S_GAMEOVER,
     S_COUNT
 };
 
 enum MAPSTATE
 {
     lvl1,
-    lvl1Part2,
     lvl2
 };
 
@@ -94,13 +91,11 @@ void gameplayKBHandler(const KEY_EVENT_RECORD& keyboardEvent);   // handles keyb
 void gameplayMouseHandler(const MOUSE_EVENT_RECORD& mouseEvent); // handles mouse events for gameplay 
 
 void loadlvl1();
-void loadlvl1Part2();
 void lvl1TXT();
 void lvl1TXTclear();
 void loadlvl2();
 
 void gameOver();
 void triggerGameOver();
-void selectRetry();
 void selectQuit();
 #endif // _GAME_H
